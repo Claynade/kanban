@@ -1,17 +1,19 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import MainLayout from './layout/MainLayout';
 import Dashboard from './pages/Dashboard';
+import ProjectPage from './pages/ProjectPage';
 import NotFound from './pages/NotFound';
 
 const App = () => {
   return (
-    <div className='max-w-7xl mx-auto min-h-screen'>
-      <Routes>
-        <Route path='/' element={<Dashboard />} />
-        <Route path='*' element={<NotFound />} />
-      </Routes>
-    </div>
-  )
-}
+    <Routes>
+      <Route path='/' element={<MainLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path='project/:id' element={<ProjectPage />} />
+      </Route>
+      <Route path='*' element={<NotFound />} />
+    </Routes>
+  );
+};
 
-export default App
+export default App;
