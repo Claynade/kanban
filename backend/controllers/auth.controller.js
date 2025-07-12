@@ -19,13 +19,23 @@ export const signup = async (req, res) => {
         const user = new User({name: name, email: email, password: password, projects: [], authenticateKey: randomKey});
 
         await user.save();
+
         res.cookie('authenticateKey', randomKey, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
+            secure: true, // Important for Render (uses HTTPS)
+            sameSite: 'None', // Allow cross-origin
+            maxAge: 24 * 60 * 60 * 1000
         });
         
-        return res.status(201).json({ message: 'User created successfully', user });
+        const userData = {
+            name: user.name,
+            email: user.email,
+            projects: user.projects
+        };
+        return res.status(200).json({
+            message: "User created successfully!",
+            user: userData
+        });
     }catch (error){
         console.error('Error during signup:', error);
         return res.status(500).json({ message: 'Internal server error' });
@@ -45,10 +55,20 @@ export const login = async (req, res) => {
         const authenticateKey = user.authenticateKey;
         res.cookie('authenticateKey', authenticateKey, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
+            secure: true, // Important for Render (uses HTTPS)
+            sameSite: 'None', // Allow cross-origin
+            maxAge: 24 * 60 * 60 * 1000
         });
-        return res.status(200).json({ message: 'Login successful', user });
+
+        const userData = {
+            name: user.name,
+            email: user.email,
+            projects: user.projects
+        };
+        return res.status(200).json({
+            message: "Login successful",
+            user: userData
+        });
     }catch (error) {
         console.error('Error during login:', error);
         return res.status(500).json({ message: 'Internal server error' });
