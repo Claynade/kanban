@@ -14,12 +14,12 @@ const MainLayout = () => {
         <header className="bg-[#f8fafc] shadow-sm border-b border-gray-200">
           <Navbar />
         </header>
-        <main className="flex-1 p-6 bg-transparent">
+        <main className="flex-1 py-6 px-6 bg-transparent">
           <Outlet />
         </main>
-        <footer className="bg-white shadow-inner py-2 px-4 border-t border-gray-100">
+{/*         <footer className="bg-white shadow-inner py-2 px-4 border-t border-gray-100">
           <Footer />
-        </footer>
+        </footer> */}
       </div>
     </div>
   );
