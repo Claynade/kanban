@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { use } from 'react'
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
+    <div className=''>Dashboard</div>
   )
 }
 
