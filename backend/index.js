@@ -16,10 +16,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://kanban-peach-five.vercel.app'], //for development, change to your frontend URL in production
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.FRONTEND_URL || 'https://kanban-peach-five.vercel.app']
+    : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 

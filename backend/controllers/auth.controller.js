@@ -22,9 +22,10 @@ export const signup = async (req, res) => {
 
         res.cookie('authenticateKey', randomKey, {
             httpOnly: true,
-            secure: true, // Important for Render (uses HTTPS)
-            sameSite: 'None', // Allow cross-origin
-            maxAge: 24 * 60 * 60 * 1000
+            secure: process.env.NODE_ENV === 'production', // Only secure in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Cross-origin in production
+            maxAge: 24 * 60 * 60 * 1000,
+            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
         });
         
         const userData = {
@@ -55,9 +56,10 @@ export const login = async (req, res) => {
         const authenticateKey = user.authenticateKey;
         res.cookie('authenticateKey', authenticateKey, {
             httpOnly: true,
-            secure: true, // Important for Render (uses HTTPS)
-            sameSite: 'None', // Allow cross-origin
-            maxAge: 24 * 60 * 60 * 1000
+            secure: process.env.NODE_ENV === 'production', // Only secure in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Cross-origin in production
+            maxAge: 24 * 60 * 60 * 1000,
+            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
         });
 
         const userData = {
@@ -71,6 +73,24 @@ export const login = async (req, res) => {
         });
     }catch (error) {
         console.error('Error during login:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie('authenticateKey', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+        });
+        
+        return res.status(200).json({
+            message: "Logout successful"
+        });
+    } catch (error) {
+        console.error('Error during logout:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 }
