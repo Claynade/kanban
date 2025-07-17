@@ -7,6 +7,7 @@ import userRouter from './routes/user.route.js';
 import taskRouter from './routes/task.route.js';
 import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 
 
 dotenv.config();
@@ -20,7 +21,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');

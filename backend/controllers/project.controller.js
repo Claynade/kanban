@@ -1,5 +1,6 @@
 import {Project} from '../models/projects.model.js';
 import {User} from '../models/users.model.js';
+import {Task} from '../models/tasks.model.js';
 export const getProject = async (req, res) => {
     const { id } = req.params;
     try {
@@ -11,6 +12,8 @@ export const getProject = async (req, res) => {
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized access' });
         }
+        // Later fix: however if someone edits their cookies, and find a valid authenticateKey, they can get someone else's project
+
         const user_id = user._id.toString();
         if (!project.authorizedUsers.includes(user_id)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
@@ -29,19 +32,29 @@ export const createProject = async (req, res) => {
     }
     try{
         const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
+        if (!user) {
+            return res.status(401).json({ message: 'Unauthorized access' });
+        }
+        // Later fix: however if someone edits their cookies, and find a valid authenticateKey, they can create a project for someone else
         const newProject = new Project({ name: name, authorizedUsers: [user._id.toString()], tasks: [] });
         await newProject.save()
-        user.projects.push(newProject._id);
-        await user.save(); // make these atomic
+        try {
+
+            user.projects.push({ id: newProject._id, name: newProject.name });
+            await user.save(); // make these atomic
+        }
+        catch (error) {
+            console.error('Error updating user projects:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
         res.status(201).json({ message: 'Project created successfully', newProject});
     }catch (error) {
         console.error('Error creating project:', error);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 }
 
 export const updateProject = async (req, res) => {
-    const { id } = req.params;
     const updatedProject = req.body;
     console.log('Updating project with ID:', id, 'with data:', updatedProject);
     try {
@@ -57,9 +70,19 @@ export const updateProject = async (req, res) => {
         if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
-        project.name = updatedProject.name || project.name;
         project.authorizedUsers = updatedProject.authorizedUsers || project.authorizedUsers;
         // new authorized users should be notified
+        // if name is change, update user.projects
+        if (updatedProject.name && updatedProject.name !== project.name) {
+            user.projects = user.projects.map(p => {
+                if (p.id.toString() === id) {
+                    return { id: p.id, name: updatedProject.name };
+                }
+                return p;
+            });
+            await user.save();
+        }
+        project.name = updatedProject.name || project.name;
         project.tasks = updatedProject.tasks || project.tasks;
         await project.save();
         return res.json({ message: 'Project updated successfully', project });
@@ -84,6 +107,13 @@ export const deleteProject = async (req, res) => {
         if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
+        // delete all the tasks in this project
+        for (const taskId of project.tasks) {
+            await Task.deleteOne({ _id: taskId });
+        }
+        // remove project from user's projects
+        user.projects = user.projects.filter(p => p.id.toString() !== id);
+        await user.save();
         await Project.deleteOne({ _id: id });
         return res.status(204).send();
     } catch (error) {

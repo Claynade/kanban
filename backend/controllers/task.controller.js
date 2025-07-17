@@ -29,6 +29,7 @@ export const getTask = async (req, res) => {
 
 export const createTask = async (req, res) => {
     const { id } = req.params;
+
     const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
     if (!user) {
         return res.status(401).json({ message: 'Unauthorized access' });
@@ -66,7 +67,7 @@ export const createTask = async (req, res) => {
 
 export const updateTask = async (req, res) => {
     const { id } = req.params;
-    const { task_id } = req.query;
+    const { task_id } = req.params;
     console.log("Updating task with data:", req.body, req.query);
     const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
     if (!user) {
@@ -101,8 +102,30 @@ export const updateTask = async (req, res) => {
     }
 }
 export const deleteTask = async (req, res) => {
-    // only auth users can delete
-    // project must exist
-    // task must exist
-    // task must be created by user
+    const { id, task_id } = req.params;
+    const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
+    if (!user) {
+        return res.status(401).json({ message: 'Unauthorized access' });
+    }
+    try {
+        const project = await Project.findOne({ _id: id });
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        if (!project.authorizedUsers.includes(user._id.toString())) {
+            return res.status(403).json({ message: 'Unauthorized access to project' });
+        }
+        const task = await Task.findOne({ _id: task_id, projectId: id });
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found or unauthorized' });
+        }
+        // can check task.assignedTo or task.createdby to ensure user is allowed to delete this task
+        await Task.deleteOne({ _id: task_id });
+        project.tasks = project.tasks.filter(t => t.toString() !== task_id);
+        await project.save();
+        return res.json({ message: 'Task deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
 }

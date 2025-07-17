@@ -1,10 +1,9 @@
 import express from 'express';
-import { getUserProjects, createUserProject, updateUserProject, deleteUserProject } from '../controllers/user.controller.js';
+import {getUsername, getUserProjects, getUserData } from '../controllers/user.controller.js';
 
 const router = express.Router();
-router.get('/', getUserProjects);
-router.post('/', createUserProject);
-router.put('/:id', updateUserProject);
-router.delete('/:id', deleteUserProject);
+router.get('/u/:userId', getUsername);
+router.get('/projects', getUserProjects);
+router.get('/data', getUserData);
 
 export default router;
