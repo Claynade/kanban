@@ -21,7 +21,15 @@ const userSchema = new mongoose.Schema({
         trim: true
     },
     projects: [{
-        type: String
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Project',
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        }
     }],
     authenticateKey:{
         type: String,
