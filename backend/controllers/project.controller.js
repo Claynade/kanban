@@ -13,7 +13,6 @@ export const getProject = async (req, res) => {
             return res.status(401).json({ message: 'Unauthorized access' });
         }
         // Later fix: however if someone edits their cookies, and find a valid authenticateKey, they can get someone else's project
-
         const user_id = user._id.toString();
         if (!project.authorizedUsers.includes(user_id)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });

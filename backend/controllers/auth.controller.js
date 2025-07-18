@@ -21,11 +21,10 @@ export const signup = async (req, res) => {
         await user.save();
 
         res.cookie('authenticateKey', randomKey, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Only secure in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Cross-origin in production
-            maxAge: 24 * 60 * 60 * 1000,
-            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+        maxAge: 30 * 24 * 60 * 60 * 1000
         });
         
         const userData = {
@@ -56,10 +55,9 @@ export const login = async (req, res) => {
         const authenticateKey = user.authenticateKey;
         res.cookie('authenticateKey', authenticateKey, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Only secure in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Cross-origin in production
-            maxAge: 24 * 60 * 60 * 1000,
-            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+            secure: true,
+            sameSite: 'None',
+            maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
         const userData = {
