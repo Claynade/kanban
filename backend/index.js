@@ -18,8 +18,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? [
-        process.env.FRONTEND_URL || 'https://kanban-peach-five.vercel.app',
-        'https://kanban.rahulnaithani.xyz'
+        process.env.FRONTEND_URL || 'https://kanban.rahulnaithani.xyz',
+        'https://kanban-peach-five.vercel.app'
       ]
     : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true
