@@ -106,11 +106,9 @@ export const deleteProject = async (req, res) => {
         if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
-        // delete all the tasks in this project
         for (const taskId of project.tasks) {
             await Task.deleteOne({ _id: taskId });
         }
-        // remove project from user's projects
         user.projects = user.projects.filter(p => p.id.toString() !== id);
         await user.save();
         await Project.deleteOne({ _id: id });

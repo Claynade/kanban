@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import API from "../utils/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { AiFillDelete } from "react-icons/ai";
-const customScrollbarCss =
-  "overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-50";
-
+import { customScrollbarCss } from "../utils/customScrollbarCss";
 const Modal = ({
   onClose,
   newProjectName,
@@ -26,11 +24,9 @@ const Modal = ({
       className="modal-overlay w-screen h-screen fixed top-0 left-0 bg-black/50 flex justify-center items-center z-50"
       onClick={handleBackgroundClick}
     >
-      <div className="flex flex-col justify-start bg-white p-6 w-[400px] rounded-lg shadow-lg">
-        <h2 className="text-2xl text-gray-600 font-bold mb-4">
-          Create a New Project
-        </h2>
-        <label className="block text-gray-700 my-2" htmlFor="projectName">
+      <div className="flex flex-col justify-start bg-[var(--card)] text-[var(--card-foreground)] p-6 w-[400px] rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4">Create a New Project</h2>
+        <label className="block my-2" htmlFor="projectName">
           Project Name:
         </label>
         <input
@@ -43,10 +39,7 @@ const Modal = ({
           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:border-purple-400"
           id="projectName"
         />
-        <label
-          className="block text-gray-700 my-2"
-          htmlFor="projectDescription"
-        >
+        <label className="block my-2" htmlFor="projectDescription">
           Description:
         </label>
         <textarea
@@ -66,20 +59,20 @@ const Modal = ({
             className={`btn ${
               isCreating
                 ? "opacity-50 cursor-not-allowed"
-                : "px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                : "px-4 py-2 bg-[var(--purple-button)] text-[var(--purple-button-foreground)] rounded-md hover:bg-[var(--purple-button-hover)]"
             }`}
           >
             {isCreating ? "Creating..." : "Create Project"}
           </button>
           <button
-            onClick={handleCreateProject}
+            onClick={onClose}
             disabled={isCreating}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+            className="px-4 py-2 bg-[var(--secondary)] text-[var(--muted-foreground)] rounded-md hover:bg-[var(--muted)]"
           >
             Cancel
           </button>
         </div>
-        {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
+        {message && <p className="mt-2 text-sm">{message}</p>}
       </div>
     </div>
   );
@@ -96,19 +89,17 @@ const ProjectCard = ({ title, _id, deleteProject }) => {
   return (
     <div
       className={`flex flex-col justify-center cursor-pointer items-center rounded-lg mb-2 p-2 w-full text-center transition-all duration-200
-          shadow-[0_4px_2px_rgba(0,0,0,0.1)]
-          ${
-            isActive
-              ? "bg-[#532b9e] border-r-[3px] border-solid border-gray-300"
-              : "hover:bg-violet-800"
-          }
-        `}
+        shadow-[0_4px_2px_rgba(0,0,0,0.1)]
+        ${
+          isActive
+            ? "bg-[var(--purple-button-hover)] border-r-[3px] border-solid border-[var(--sidebar-border)]"
+            : "hover:bg-[var(--sidebar-accent)]"
+        }
+      `}
       onClick={handleClick}
     >
-      <div className="flex flex-row justify-between items-center w-full">
-        <h2 className="text-md text-blue-50 font-sans w-full text-center">
-          {title}
-        </h2>
+      <div className="flex flex-row justify-between items-center w-full pl-3">
+        <h2 className="text-md font-sans w-full text-left">{title}</h2>
         {isActive ? (
           <div
             className="group flex items-center justify-center w-[30px] h-[25px] cursor-pointer hover:bg-red-400 rounded-full"
@@ -138,11 +129,7 @@ const Sidebar = () => {
     setIsCreating(true);
     setMessage("");
     try {
-      const response = await API.post(
-        "/projects/",
-        { name: newProjectName },
-        { withCredentials: true }
-      );
+      const response = await API.post("/projects/", { name: newProjectName });
 
       if (!response.data || !response.data.newProject) {
         setMessage("Failed to create project");
@@ -171,9 +158,7 @@ const Sidebar = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await API.get("/users/projects", {
-        withCredentials: true,
-      });
+      const response = await API.get("/users/projects");
       if (response.status === 200) {
         setProjects(response.data.projects);
       } else {
@@ -185,19 +170,17 @@ const Sidebar = () => {
       setMessage("Error fetching projects");
     }
   };
+
   const deleteProject = async (e) => {
-    e.stopPropagation(); // for preventing the click event from propagating to the parent div
+    e.stopPropagation();
     if (!window.confirm("Are you sure you want to delete this project?"))
       return;
     try {
-      const response = await API.delete(`/projects/${id}`, {
-        withCredentials: true,
-      });
+      const response = await API.delete(`/projects/${id}`);
       if (response.status === 204) {
         setProjects((prev) => prev.filter((project) => project.id !== id));
         setMessage("Project deleted successfully");
         navigate("/");
-        console.error("navigation worked");
         fetchProjects();
       } else {
         console.error("Failed to delete project:", response);
@@ -208,33 +191,39 @@ const Sidebar = () => {
       setMessage("Error deleting project");
     }
   };
+
   useEffect(() => {
     fetchProjects();
   }, []);
 
   return (
-    <div className="flex flex-col bg-gradient-to-br from-purple-900 to-indigo-900 h-screen items-center shadow text-black py-4">
-      <div className="h-[80px] flex flex-row gap-4 items-center justify-center font-[Shantell_sans] text-white text-2xl font-bold">
+    <div className="flex flex-col bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)] h-screen items-center shadow py-1">
+      <div className="h-[60px]  flex flex-row gap-4 items-center justify-center font-[Shantell_sans] text-[var(--sidebar-primary)] text-2xl font-bold">
         <img src="/icon.svg" className="h-10 mx-auto" alt="Logo" />
         kanban
       </div>
 
       <div className="w-full h-full flex flex-col items-center justify-between">
-        <div
-          className={`flex flex-col p-4 mr-2 w-full max-h-[530px] overflow-auto ${customScrollbarCss}`}
-        >
-          {projects.map((project, _) => (
-            <ProjectCard
-              key={project.id}
-              title={project.name}
-              _id={project.id}
-              deleteProject={deleteProject}
-            />
-          ))}
+        <div className="w-full flex flex-col items-center justify-start">
+          <h2 className="text-md font-sans w-full py-2 pl-7 border-t text-sm text-[var(--sidebar-muted)] font-medium border-[var(--border)]">
+            Projects
+          </h2>
+          <div
+            className={`flex flex-col p-2 w-full max-h-[530px] overflow-auto ${customScrollbarCss}`}
+          >
+            {projects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                title={project.name}
+                _id={project.id}
+                deleteProject={deleteProject}
+              />
+            ))}
+          </div>
         </div>
 
         <div
-          className="flex h-12 pb-3 w-12 bg-gray-50 text-gray-600 text-5xl rounded-full justify-center items-center hover:bg-red-400 hover:text-gray-50 cursor-pointer mt-4"
+          className="flex h-12 pb-3 w-12 bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] text-5xl rounded-full justify-center items-center hover:bg-red-400 hover:text-gray-50 cursor-pointer mt-4"
           onClick={() => {
             setAddProjectMenu(true);
             setMessage("");
@@ -256,7 +245,7 @@ const Sidebar = () => {
           handleCreateProject={handleCreateProject}
           isCreating={isCreating}
           message={message}
-        ></Modal>
+        />
       )}
     </div>
   );

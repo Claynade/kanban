@@ -1,25 +1,19 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
 
 const MainLayout = () => {
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#f1f5f9] to-white text-gray-800">
-      <div className="h-screen w-[230px] bg-orange-300 text-white shadow-md">
+    <div className="flex min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <div className="h-screen w-[200px] bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)] shadow-md">
         <Sidebar />
       </div>
-      <div className="flex-1 flex flex-col h-screen overflow-auto">
-        <header className="bg-[#f8fafc] shadow-sm border-b border-gray-200">
-          <Navbar />
-        </header>
-        <main className="flex-1 py-6 px-6 bg-transparent">
+      <div className="flex-1 flex flex-col h-screen overflow-y-auto overflow-x-hidden">
+        <Navbar />
+        <main className="flex-1 px-6 pt-10">
           <Outlet />
         </main>
-{/*         <footer className="bg-white shadow-inner py-2 px-4 border-t border-gray-100">
-          <Footer />
-        </footer> */}
       </div>
     </div>
   );
