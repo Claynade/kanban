@@ -34,9 +34,9 @@ export const createTask = async (req, res) => {
     if (!user) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
-    const { status, title, description } = req.body;
-    if (!status || !title || !description) {
-        return res.status(400).json({ message: 'Project ID, title, and description are required' });
+    const { status, title, description, priority } = req.body;
+    if (!status || !title || !description || !priority) {
+        return res.status(400).json({ message: 'Project ID, title, description, and priority are required' });
     }
     try {
         const project = await Project.findOne({ _id: id });
@@ -51,6 +51,7 @@ export const createTask = async (req, res) => {
             title,
             description,
             status,
+            priority,
             projectId: id,
             createdBy: user._id,
             assignedTo: [user._id]

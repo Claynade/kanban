@@ -116,6 +116,7 @@ const ListCard = ({
               handleClick={() => handleClick(task._id)}
               title={task.title}
               description={task.description}
+              priority={task.priority}
               createdBy={task.createdBy}
               cardSelected={cardSelected}
               status={task.status}

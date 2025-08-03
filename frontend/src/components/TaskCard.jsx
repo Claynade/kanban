@@ -38,6 +38,7 @@ const TaskCard = ({
   handleClick,
   title,
   description,
+  priority,
   createdBy,
   cardSelected,
   status,
@@ -89,23 +90,21 @@ const TaskCard = ({
     );
   };
 
-  const PriorityTag = () => {
+  const PriorityTag = ({ priority }) => {
+    console.log("Priority:", priority);
     const priorityColors = {
-      low: "bg-[var(--priority-low-bg)] text-[var(--priority-low-fg)] border-[var(--priority-low-border)] dark:bg-[var(--priority-low-bg)] dark:text-[var(--priority-low-fg)] dark:border-[var(--priority-low-border)]",
-      medium:
+      Low: "bg-[var(--priority-low-bg)] text-[var(--priority-low-fg)] border-[var(--priority-low-border)] dark:bg-[var(--priority-low-bg)] dark:text-[var(--priority-low-fg)] dark:border-[var(--priority-low-border)]",
+      Medium:
         "bg-[var(--priority-medium-bg)] text-[var(--priority-medium-fg)] border-[var(--priority-medium-border)] dark:bg-[var(--priority-medium-bg)] dark:text-[var(--priority-medium-fg)] dark:border-[var(--priority-medium-border)]",
-      high: "bg-[var(--priority-high-bg)] text-[var(--priority-high-fg)] border-[var(--priority-high-border)] dark:bg-[var(--priority-high-bg)] dark:text-[var(--priority-high-fg)] dark:border-[var(--priority-high-border)] ",
+      High: "bg-[var(--priority-high-bg)] text-[var(--priority-high-fg)] border-[var(--priority-high-border)] dark:bg-[var(--priority-high-bg)] dark:text-[var(--priority-high-fg)] dark:border-[var(--priority-high-border)] ",
     };
-    const priorities = ["low", "medium", "high"];
-    const randomPriority =
-      priorities[Math.floor(Math.random() * priorities.length)];
     return (
       <div className="flex text-xs items-center">
         <span className=" text-gray-500"></span>
         <span
-          className={`ml-1 px-2 py-1 rounded-full border ${priorityColors[randomPriority]}`}
+          className={`ml-1 px-2 py-1 rounded-full border ${priorityColors[priority]}`}
         >
-          {randomPriority.charAt(0).toUpperCase() + randomPriority.slice(1)}
+          {priority}
         </span>
       </div>
     );
@@ -139,7 +138,7 @@ const TaskCard = ({
             <h2 className="font-medium mb-2 text-sm text-[var(--foreground)] leading-tight">
               {title}
             </h2>
-            <PriorityTag />
+            <PriorityTag priority={priority} />
           </div>
           <p className="text-xs text-[var(--muted-foreground)] line-clamp-2">
             {description}

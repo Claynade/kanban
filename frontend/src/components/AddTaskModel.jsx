@@ -12,6 +12,7 @@ const AddTaskModel = ({ setAddTaskMenu, fetchProject, defaultStatus }) => {
     title: "",
     description: "",
     status: defaultStatus,
+    priority: "Low",
   });
 
   const handleClose = (e) => {
@@ -51,6 +52,7 @@ const AddTaskModel = ({ setAddTaskMenu, fetchProject, defaultStatus }) => {
         title: "",
         description: "",
         status: "backlog",
+        priority: "Low",
       });
     }
   };
@@ -90,6 +92,16 @@ const AddTaskModel = ({ setAddTaskMenu, fetchProject, defaultStatus }) => {
             <option value="backlog">Backlog</option>
             <option value="todo">To-Do</option>
             <option value="done">Done</option>
+          </select>
+          <select
+            name="priority"
+            className="w-full px-4 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)]"
+            value={newTask.priority}
+            onChange={handleChange}
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
           </select>
           <div className="flex justify-between">
             <button
