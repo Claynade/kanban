@@ -15,11 +15,8 @@ export const getUserData = async (req, res) => {
     if (!user) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
-    const userData = {
+    return res.status(200).json({
         name: user.name,
         email: user.email
-    };
-    return res.status(200).json({
-        user: userData
     });
 }

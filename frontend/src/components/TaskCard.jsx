@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "../utils/api";
 import { AiFillDelete } from "react-icons/ai";
+import { getUserData } from "../../../backend/controllers/user.controller";
 
 const TaskMeta = ({ username }) => {
   return (
@@ -113,8 +114,9 @@ const TaskCard = ({
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await API.get(`/users/u/${createdBy}`);
-        setUsername(response.data.username || "Unknown User");
+        const response = await API.get(`/users/data`);
+        console.log("User data:", response);
+        setUsername(response.data.name || "Unknown User");
       } catch (error) {
         console.error("Error fetching user:", error);
         setUsername("Unknown User");
