@@ -12,6 +12,7 @@ const AddTask = ({
   setAddTaskMenu,
   fetchProject,
   defaultStatus,
+  setTasks,
 }) => {
   return (
     <div className="flex flex-col items-center justify-center h-[60px]">
@@ -23,6 +24,7 @@ const AddTask = ({
       </div>
       {addTaskMenu && (
         <AddTaskModel
+          setTasks={setTasks}
           setAddTaskMenu={setAddTaskMenu}
           fetchProject={fetchProject}
           defaultStatus={defaultStatus}
@@ -144,6 +146,7 @@ const ProjectPage = () => {
           setAddTaskMenu={setAddTaskMenu}
           fetchProject={fetchProject}
           defaultStatus={defaultStatus}
+          setTasks={setTasks}
         />
       </div>
     </div>

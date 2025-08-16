@@ -118,6 +118,7 @@ const ListCard = ({
               description={task.description}
               priority={task.priority}
               createdBy={task.createdBy}
+              createdAt={task.createdAt}
               cardSelected={cardSelected}
               status={task.status}
               markComplete={markComplete}

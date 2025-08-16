@@ -21,7 +21,8 @@ const projectSchema = new mongoose.Schema({
     }],
     authorizedUsers: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: false
     }],
 
 });

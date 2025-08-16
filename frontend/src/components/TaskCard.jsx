@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import API from "../utils/api";
 import { AiFillDelete } from "react-icons/ai";
-import { getUserData } from "../../../backend/controllers/user.controller";
+import { useNavigate, useParams } from "react-router-dom";
 
-const TaskMeta = ({ username }) => {
+const TaskMeta = ({ username, createdAt }) => {
+  const year = createdAt.split("-")[0];
+  const month = createdAt.split("-")[1];
+  const day = createdAt.split("-")[2].split("T")[0];
   return (
     <div className="rounded-md">
       <div className="flex items-center justify-between">
@@ -22,7 +25,11 @@ const TaskMeta = ({ username }) => {
 
         <div className="flex items-center space-x-2 text-[var(--muted-foreground)]">
           <div className="flex items-center space-x-1">
-            <span className="text-xs">Jul 25</span>
+            <span className="text-xs">
+              {new Date().getFullYear() == year
+                ? day + "/" + month
+                : day + "/" + month + "/" + year}
+            </span>
           </div>
           <div className="flex items-center space-x-1">
             <span className="text-[10px]">💬</span>
@@ -41,6 +48,7 @@ const TaskCard = ({
   description,
   priority,
   createdBy,
+  createdAt,
   cardSelected,
   status,
   markComplete,
@@ -51,6 +59,14 @@ const TaskCard = ({
   const tags = ["bug", "feature", "enhancement"];
   const [username, setUsername] = useState("Loading...");
   const isSelected = cardSelected === _id;
+  const Navigate = useNavigate();
+  const { id } = useParams();
+  const openTaskThread = () => {
+    console.log("Opening task thread for:", _id);
+    if (!_id || _id == "temp") return;
+
+    Navigate(_id);
+  };
 
   const MoveButtons = () => {
     if (!isSelected) return null;
@@ -92,7 +108,6 @@ const TaskCard = ({
   };
 
   const PriorityTag = ({ priority }) => {
-    console.log("Priority:", priority);
     const priorityColors = {
       Low: "bg-[var(--priority-low-bg)] text-[var(--priority-low-fg)] border-[var(--priority-low-border)] dark:bg-[var(--priority-low-bg)] dark:text-[var(--priority-low-fg)] dark:border-[var(--priority-low-border)]",
       Medium:
@@ -115,7 +130,6 @@ const TaskCard = ({
     const fetchUser = async () => {
       try {
         const response = await API.get(`/users/data`);
-        console.log("User data:", response);
         setUsername(response.data.name || "Unknown User");
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -134,10 +148,11 @@ const TaskCard = ({
           isSelected ? " bg-[var(--secondary)]" : ""
         }`}
         onClick={handleClick}
+        onDoubleClick={openTaskThread}
       >
         <div className="pb-3">
           <div className="flex items-start justify-between">
-            <h2 className="font-medium mb-2 text-sm text-[var(--foreground)] leading-tight">
+            <h2 className="font-medium mb-2 text-sm text-[var(--foreground)] leading-tight line-clamp-2">
               {title}
             </h2>
             <PriorityTag priority={priority} />
@@ -157,7 +172,8 @@ const TaskCard = ({
               </div>
             ))}
           </div>
-          <TaskMeta username={username} />
+
+          <TaskMeta username={username} createdAt={createdAt} />
         </div>
       </div>
       {isSelected && <MoveButtons />}

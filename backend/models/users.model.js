@@ -4,21 +4,27 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         default: () => new mongoose.Types.ObjectId()
     },
-    name:{
+    name: {
         type: String,
         required: true,
         trim: true
     },
-    email:{
+    email: {
         type: String,
         required: true,
         unique: true,
         trim: true
     },
-    password:{
+    password: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        select: false // always exclude password unless explicitly requested
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
     },
     projects: [{
         id: {
@@ -31,12 +37,6 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }],
-    authenticateKey:{
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-    }
 });
 
 export const User = mongoose.model('User', userSchema);

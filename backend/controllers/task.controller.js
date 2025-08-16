@@ -4,8 +4,8 @@ import { Project } from '../models/projects.model.js';
 
 export const getTask = async (req, res) => {
     const { id, task_id } = req.params;
-    const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
-    if (!user) {
+    const userId = req.user?.userId;
+    if (!userId) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
     try {
@@ -13,25 +13,24 @@ export const getTask = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
         }
-        if (!project.authorizedUsers.includes(user._id.toString())) {
+        if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
-        const tasks = await Task.findOne({ _id : task_id });
-        if (!tasks){
+        const task = await Task.findOne({ _id: task_id });
+        if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }
-        return res.json(tasks);
+        return res.json(task);
     } catch (error) {
         console.error('Error fetching tasks:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
 
 export const createTask = async (req, res) => {
     const { id } = req.params;
-
-    const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
-    if (!user) {
+    const userId = req.user?.userId;
+    if (!userId) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
     const { status, title, description, priority } = req.body;
@@ -43,8 +42,7 @@ export const createTask = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
         }
-        //check if user is authorized to create tasks in this project
-        if (!project.authorizedUsers.includes(user._id.toString())) { //why do we need toString() here?
+        if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
         const task = new Task({
@@ -53,10 +51,10 @@ export const createTask = async (req, res) => {
             status,
             priority,
             projectId: id,
-            createdBy: user._id,
-            assignedTo: [user._id]
+            createdBy: userId,
+            assignedTo: []
         });
-        await task.save(); //later: make it atomic with project update
+        await task.save();
         project.tasks.push(task._id);
         await project.save();
         return res.status(201).json({ message: 'Task created successfully', task });
@@ -64,14 +62,12 @@ export const createTask = async (req, res) => {
         console.error('Error creating task:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
 
 export const updateTask = async (req, res) => {
-    const { id } = req.params;
-    const { task_id } = req.params;
-    console.log("Updating task with data:", req.body, req.query);
-    const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
-    if (!user) {
+    const { id, task_id } = req.params;
+    const userId = req.user?.userId;
+    if (!userId) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
     try {
@@ -79,11 +75,9 @@ export const updateTask = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
         }
-        //check if user is authorized to update tasks in this project
-        if (!project.authorizedUsers.includes(user._id.toString())) {
+        if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
-        //check if task is included in the project
         if (!project.tasks.includes(task_id)) {
             return res.status(404).json({ message: 'Task not found in this project' });
         }
@@ -94,18 +88,18 @@ export const updateTask = async (req, res) => {
         task.title = req.body.title || task.title;
         task.description = req.body.description || task.description;
         task.status = req.body.status || task.status;
-        /* task.assignedTo = req.body.assignedTo || task.assignedTo; */ // for later
+        task.priority = req.body.priority || task.priority;
         await task.save();
         return res.json({ message: 'Task updated successfully', task });
     } catch (error) {
         console.error('Error updating task:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
 export const deleteTask = async (req, res) => {
     const { id, task_id } = req.params;
-    const user = await User.findOne({ authenticateKey: req.cookies.authenticateKey });
-    if (!user) {
+    const userId = req.user?.userId;
+    if (!userId) {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
     try {
@@ -113,14 +107,13 @@ export const deleteTask = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
         }
-        if (!project.authorizedUsers.includes(user._id.toString())) {
+        if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
         const task = await Task.findOne({ _id: task_id, projectId: id });
         if (!task) {
             return res.status(404).json({ message: 'Task not found or unauthorized' });
         }
-        // can check task.assignedTo or task.createdby to ensure user is allowed to delete this task
         await Task.deleteOne({ _id: task_id });
         project.tasks = project.tasks.filter(t => t.toString() !== task_id);
         await project.save();
@@ -129,4 +122,4 @@ export const deleteTask = async (req, res) => {
         console.error('Error deleting task:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-}
+};

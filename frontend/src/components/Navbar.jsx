@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import API from "../utils/api";
+import { useAuth } from "../context/AuthContext";
 import {
   AiOutlineSetting,
   AiOutlineQuestionCircle,
@@ -7,25 +9,29 @@ import {
   AiFillMoon,
 } from "react-icons/ai";
 
-const randomColor = () => {
-  const colors = [
-    "bg-[var(--chart-1)]",
-    "bg-[var(--chart-2)]",
-    "bg-[var(--chart-3)]",
-    "bg-[var(--chart-4)]",
-    "bg-[var(--chart-5)]",
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-};
-
 export default function NavHeader(props) {
+  const { setUser } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+
+  const randomColor = () => {
+    const colors = [
+      "bg-[var(--chart-1)]",
+      "bg-[var(--chart-2)]",
+      "bg-[var(--chart-3)]",
+      "bg-[var(--chart-4)]",
+      "bg-[var(--chart-5)]",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)"
-    ).matches; // checks the window's theme
+    ).matches;
     if (savedTheme === "light" || (!savedTheme && !prefersDark)) {
       setIsDarkMode(false);
       document.documentElement.classList.remove("dark");
@@ -38,13 +44,49 @@ export default function NavHeader(props) {
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
     setIsDarkMode(newTheme);
-
     if (newTheme) {
-      document.documentElement.classList.add("dark"); // adds dark mode class to the root
+      document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
+    }
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    }
+    if (showMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMenu]);
+
+  const handleProfile = () => {
+    setShowMenu(false);
+    navigate("/profile");
+  };
+  const handleSettings = () => {
+    setShowMenu(false);
+    navigate("/settings");
+  };
+  const handleLogout = async () => {
+    setShowMenu(false);
+    try {
+      const response = await API.post("/auth/logout");
+      if (response.status === 200) {
+        setUser(null); // Clear auth state
+        navigate("/login");
+      }
+    } catch (error) {
+      setUser(null); // Ensure auth state is cleared on error
+      navigate("/login");
+      console.error("Error logging out:", error);
     }
   };
 
@@ -86,14 +128,37 @@ export default function NavHeader(props) {
             title="Settings"
           />
         </Link>
-        <Link
-          to="#"
-          className={`px-3 py-1 rounded-full ${randomColor()} hover:opacity-90 cursor-pointer`}
+        <div
+          ref={menuRef}
+          className={`relative px-3 py-1 rounded-full ${randomColor()} hover:opacity-90 cursor-pointer select-none`}
+          onClick={() => setShowMenu((prev) => !prev)}
         >
           <h1 className="text-[var(--primary-foreground)] text-xl font-semibold">
             R
           </h1>
-        </Link>
+          {showMenu && (
+            <div className="absolute right-0 top-12 min-w-[160px] bg-white dark:bg-[var(--background)] shadow-lg rounded-lg py-2 z-50 border border-[var(--border)]">
+              <button
+                className="block w-full text-left px-4 py-2 hover:bg-[var(--muted)]"
+                onClick={handleProfile}
+              >
+                View Profile
+              </button>
+              <button
+                className="block w-full text-left px-4 py-2 hover:bg-[var(--muted)]"
+                onClick={handleSettings}
+              >
+                Settings
+              </button>
+              <button
+                className="block w-full text-left px-4 py-2 hover:bg-red-100 text-red-600"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

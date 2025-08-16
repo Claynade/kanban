@@ -3,7 +3,12 @@ import { useParams } from "react-router-dom";
 import API from "../utils/api";
 import { customScrollbarCss } from "../utils/customScrollbarCss";
 
-const AddTaskModel = ({ setAddTaskMenu, fetchProject, defaultStatus }) => {
+const AddTaskModel = ({
+  setTasks,
+  setAddTaskMenu,
+  fetchProject,
+  defaultStatus,
+}) => {
   const { id } = useParams();
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
@@ -32,19 +37,29 @@ const AddTaskModel = ({ setAddTaskMenu, fetchProject, defaultStatus }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsCreating(true);
-    setMessage("");
     setError(null);
+
+    const tempId = `temp`;
+    const optimisticTask = {
+      ...newTask,
+      id: tempId,
+      createdAt: new Date().toISOString(),
+    };
+
+    setTasks((prev) => [...prev, optimisticTask]);
+    setAddTaskMenu(false);
+    setIsCreating(false);
     try {
       const response = await API.post(`/tasks/${id}`, newTask, {});
       if (response.status === 201) {
-        console.log("Task added successfully :", response.data);
+        setTasks((prev) =>
+          prev.map((t) => (t.id === tempId ? response.data : t))
+        );
         await fetchProject();
-      } else {
-        console.error("Failed to add task :", response);
       }
     } catch (err) {
+      setTasks((prev) => prev.filter((t) => t.id !== tempId));
       setError(err.message || "Error adding task");
-      console.error("Error adding task :", err);
     } finally {
       setAddTaskMenu(false);
       setIsCreating(false);

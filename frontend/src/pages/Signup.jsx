@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
+
 const SignUp = () => {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [message, setMessage] = useState("");
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
@@ -13,25 +17,18 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create account");
+      const response = await api.post("/auth/signup", form);
+      if (response.status !== 201) {
+        setMessage(response.data.message || "Account created successfully!");
+        setForm({ name: "", email: "", password: "" });
+        navigate("/login");
       }
-
-      const data = await response.json();
-      localStorage.setItem("projects", JSON.stringify(data.user.projects));
-      setMessage(data.message || "Account created successfully!");
-      setForm({ name: "", email: "", password: "" });
-      navigate("/login");
     } catch (error) {
-      setMessage(error.message || "An error occurred. Please try again.");
+      setMessage(
+        error.response?.data?.message ||
+          error.message ||
+          "An error occurred. Please try again."
+      );
     }
   };
   return (

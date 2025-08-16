@@ -83,7 +83,7 @@ const ProjectCard = ({ title, _id, deleteProject }) => {
   const navigate = useNavigate();
   const isActive = id === _id;
   const handleClick = () => {
-    navigate(`/project/${_id}`);
+    navigate(`/dashboard/project/${_id}`);
   };
 
   return (
@@ -135,7 +135,7 @@ const Sidebar = () => {
         setMessage("Failed to create project");
         return;
       }
-      navigate(`/project/${response.data.newProject._id}`);
+      navigate(`/dashboard/project/${response.data.newProject._id}`);
       fetchProjects();
       setMessage("Project created successfully");
       setNewProjectName("");

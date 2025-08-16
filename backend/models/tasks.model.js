@@ -31,9 +31,20 @@ const taskSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
      assignedTo: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        }
     }],
 })
 

@@ -1,36 +1,56 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import ProjectPage from "./pages/ProjectPage";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import { Navigate } from "react-router-dom";
+import TaskPage from "./pages/TaskPage";
+import Home from "./pages/Home";
+import { useAuth } from "./context/AuthContext";
 
-const PrivateRoute = () => {
-  const isSignedUp = localStorage.getItem("isSignedUp") === "true";
-  return isSignedUp ? <MainLayout /> : <Navigate to="/Signup" replace />;
+const ProtectedLayout = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  return (
+    <MainLayout>
+      <Outlet />
+    </MainLayout>
+  );
 };
 
-const PrivateLogin = () => {
-  const isSignedUp = localStorage.getItem("isSignedUp") === "true";
-  return isSignedUp ? <Navigate to="/" replace /> : <Login />;
-};
-
-const PrivateSignup = () => {
-  const isSignedUp = localStorage.getItem("isSignedUp") === "true";
-  return isSignedUp ? <Navigate to="/" replace /> : <Signup />;
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div>Loading...</div>;
+  return user ? <Navigate to="/dashboard" replace /> : children;
 };
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<PrivateRoute />}>
+      <Route path="/" element={<Home />} />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route path="/dashboard" element={<ProtectedLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="project/:id" element={<ProjectPage />} />
+        <Route path="project/:id/:taskId" element={<TaskPage />} />
       </Route>
-      <Route path="/Signup" element={<PrivateSignup />} />
-      <Route path="/Login" element={<PrivateLogin />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

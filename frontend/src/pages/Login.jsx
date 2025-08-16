@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
@@ -15,31 +17,17 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to login. Please check your credentials.");
-      }
-
-      const data = await response.json();
-      // data.projects is an array of projects and store it in localStorage
-      /*       data.user.projects.map((project) => {
-        localStorage.setItem(`project-${project._id}`, JSON.stringify(project));
-      }); */
-      localStorage.setItem("projects", JSON.stringify(data.user.projects));
-      setMessage(data.message || "Login successful");
+      const response = await api.post("/auth/login", form);
+      setMessage(response.data.message || "Login successful");
       setForm({ email: "", password: "" });
-      localStorage.setItem("isSignedUp", "true");
-      navigate("/");
+      setUser(response.data.user); // update global auth state
+      navigate("/dashboard");
     } catch (error) {
-      setMessage(error.message || "An error occurred. Please try again.");
+      setMessage(
+        error.response?.data?.message ||
+          error.message ||
+          "An error occurred. Please try again."
+      );
     }
   };
   return (
