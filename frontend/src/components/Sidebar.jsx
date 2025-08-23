@@ -247,7 +247,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
   return (
     <div
-      className="w-4/5 sm:w-full flex flex-col bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)] h-screen items-center shadow py-1"
+      className=" sm:w-full flex flex-col bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)] h-screen items-center shadow py-1"
       style={sidebarStyle}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}

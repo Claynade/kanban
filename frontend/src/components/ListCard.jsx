@@ -98,7 +98,7 @@ const ListCard = ({
     setAddTaskMenu(true);
   };
   return (
-    <div className="flex flex-col bg-[var(--card)] w-80 min-w-80 h-full min-h-[560px] md:h-[560px] rounded-lg shadow text-[var(--card-foreground)]">
+    <div className="flex flex-col p-2 bg-[var(--card)] w-full min-w-[220px] max-w-[350px] h-full min-h-[560px] md:h-[560px] 2xl:h-full rounded-lg shadow text-[var(--card-foreground)]">
       <ListCardHeader
         type={type}
         status={status}
