@@ -34,7 +34,7 @@ const AddTask = ({
     <div className="flex flex-col items-center justify-center h-[60px]">
       <AddTaskButton
         onClick={() => setAddTaskMenu(true)}
-        className="hidden md:block"
+        className="hidden 2xl:block"
       />
       {addTaskMenu && (
         <AddTaskModel
@@ -194,6 +194,14 @@ const ProjectPage = () => {
           className="flex-grow min-w-[220px] max-w-[400px]"
         />
       ))}
+      {addTaskMenu && (
+        <AddTaskModel
+          setTasks={setTasks}
+          setAddTaskMenu={setAddTaskMenu}
+          fetchProject={fetchProject}
+          defaultStatus={defaultStatus}
+        />
+      )}
     </div>
   );
 

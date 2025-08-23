@@ -1,18 +1,16 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import API from "../utils/api";
 import { customScrollbarCss } from "../utils/customScrollbarCss";
 
-/**
- * Custom hook to manage task creation
- */
-const useTaskCreation = (
+const AddTaskModel = ({
   setTasks,
   setAddTaskMenu,
   fetchProject,
-  defaultStatus
-) => {
+  defaultStatus,
+}) => {
   const { id } = useParams();
+  const titleInputRef = useRef(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -23,6 +21,18 @@ const useTaskCreation = (
     priority: "Low",
   });
 
+  useEffect(() => {
+    if (titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
+  }, []);
+
+  const handleClose = (e) => {
+    if (e.target.classList.contains("modal-layout")) {
+      setAddTaskMenu(false);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewTask((prev) => ({
@@ -31,141 +41,43 @@ const useTaskCreation = (
     }));
   };
 
-  const resetForm = () => {
-    setNewTask({
-      title: "",
-      description: "",
-      status: "backlog",
-      priority: "Low",
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsCreating(true);
     setError(null);
 
-    // Create a temporary ID for optimistic UI update
-    const tempId = `temp_${Date.now()}`;
+    const tempId = `temp`;
     const optimisticTask = {
       ...newTask,
       id: tempId,
       createdAt: new Date().toISOString(),
     };
 
-    // Add task optimistically
     setTasks((prev) => [...prev, optimisticTask]);
     setAddTaskMenu(false);
-
+    setIsCreating(false);
     try {
-      // Make API call to actually create the task
       const response = await API.post(`/tasks/${id}`, newTask, {});
-
       if (response.status === 201) {
-        // Replace optimistic task with real one
         setTasks((prev) =>
           prev.map((t) => (t.id === tempId ? response.data : t))
         );
         await fetchProject();
       }
     } catch (err) {
-      // Remove optimistic task on error
       setTasks((prev) => prev.filter((t) => t.id !== tempId));
       setError(err.message || "Error adding task");
     } finally {
-      setIsCreating(false);
-      resetForm();
-    }
-  };
-
-  return {
-    newTask,
-    isCreating,
-    message,
-    error,
-    handleChange,
-    handleSubmit,
-    resetForm,
-  };
-};
-
-/**
- * AddTaskModel component provides a modal for creating new tasks
- */
-const AddTaskModel = ({
-  setTasks,
-  setAddTaskMenu,
-  fetchProject,
-  defaultStatus,
-}) => {
-  const { newTask, isCreating, message, error, handleChange, handleSubmit } =
-    useTaskCreation(setTasks, setAddTaskMenu, fetchProject, defaultStatus);
-
-  // Close modal when clicking outside
-  const handleClose = (e) => {
-    if (e.target.classList.contains("modal-layout")) {
       setAddTaskMenu(false);
+      setIsCreating(false);
+      setNewTask({
+        title: "",
+        description: "",
+        status: "backlog",
+        priority: "Low",
+      });
     }
   };
-
-  /**
-   * FormInput component for text input fields
-   */
-  const FormInput = ({ type = "text", name, placeholder, value, onChange }) => (
-    <input
-      type={type}
-      placeholder={placeholder}
-      name={name}
-      className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)] text-base"
-      value={value}
-      onChange={onChange}
-    />
-  );
-
-  /**
-   * FormTextarea component for multiline text input
-   */
-  const FormTextarea = ({ name, placeholder, value, onChange, rows = "3" }) => (
-    <textarea
-      placeholder={placeholder}
-      name={name}
-      className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)] text-base"
-      rows={rows}
-      value={value}
-      onChange={onChange}
-    />
-  );
-
-  /**
-   * FormSelect component for dropdown selection
-   */
-  const FormSelect = ({ name, value, onChange, options }) => (
-    <select
-      name={name}
-      className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)] text-base"
-      value={value}
-      onChange={onChange}
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  );
-
-  // Status and priority options for select fields
-  const statusOptions = [
-    { value: "backlog", label: "Backlog" },
-    { value: "todo", label: "To-Do" },
-    { value: "done", label: "Done" },
-  ];
-
-  const priorityOptions = [
-    { value: "Low", label: "Low" },
-    { value: "Medium", label: "Medium" },
-    { value: "High", label: "High" },
-  ];
 
   return (
     <div
@@ -177,44 +89,48 @@ const AddTaskModel = ({
           Add New Task
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          {/* Task title input */}
-          <FormInput
-            name="title"
+          <input
+            ref={titleInputRef}
+            type="text"
             placeholder="Task Title"
+            name="title"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)] text-base"
             value={newTask.title}
             onChange={handleChange}
           />
-
-          {/* Task description textarea */}
-          <FormTextarea
-            name="description"
+          <textarea
             placeholder="Task Description"
+            name="description"
+            className="w-full h- px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)] text-base"
+            rows="3"
             value={newTask.description}
             onChange={handleChange}
-          />
-
-          {/* Task status select */}
-          <FormSelect
+          ></textarea>
+          <select
             name="status"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)] text-base sm:text-sm"
             value={newTask.status}
             onChange={handleChange}
-            options={statusOptions}
-          />
-
-          {/* Task priority select */}
-          <FormSelect
+          >
+            <option value="backlog">Backlog</option>
+            <option value="todo">To-Do</option>
+            <option value="done">Done</option>
+          </select>
+          <select
             name="priority"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)] text-base sm:text-sm"
             value={newTask.priority}
             onChange={handleChange}
-            options={priorityOptions}
-          />
-
-          {/* Form action buttons */}
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2">
             <button
               type="submit"
               disabled={isCreating}
-              className="w-full sm:w-auto px-4 py-2 bg-[var(--purple-button)] text-[var(--purple-button-foreground)] rounded-md hover:bg-[var(--purple-button-hover)]"
+              className="w-full sm:w-auto px-4 py-2 bg-[var(--purple-button)] text-[var(--purple-button-foreground)] rounded-md hover:bg-[var(--purple-button-hover)] "
             >
               Add Task
             </button>
@@ -227,8 +143,6 @@ const AddTaskModel = ({
               Cancel
             </button>
           </div>
-
-          {/* Status messages */}
           {message && <p className="mt-2 text-sm text-green-600">{message}</p>}
           {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         </form>

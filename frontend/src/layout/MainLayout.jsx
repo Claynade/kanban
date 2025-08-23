@@ -37,7 +37,7 @@ const MainLayout = () => {
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
-        <main className="flex-1 px-6 pt-6 md:pt-10">
+        <main className="flex-1 px-6 pt-6">
           <Outlet />
         </main>
       </div>
