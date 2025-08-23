@@ -110,36 +110,34 @@ const ProjectPage = () => {
             </button>
           ))}
         </div>
-        {/* Mobile: lists full width, AddTask visible */}
-        <div className="md:hidden w-full flex flex-row gap-4 flex-grow min-w-0">
-          <div className="w-full flex flex-col min-w-0">
-            <div className="md:hidden w-full">
-              {tabList.map((tab) =>
-                activeTab === tab.status ? (
-                  <ListCard
-                    key={tab.status}
-                    type={tab.label}
-                    status={tab.status}
-                    tasks={tasks}
-                    cardSelected={cardSelected}
-                    setCardSelected={setCardSelected}
-                    setAddTaskMenu={setAddTaskMenu}
-                    setDefaultStatus={setDefaultStatus}
-                    fetchProject={fetchProject}
-                    className="w-full"
-                  />
-                ) : null
-              )}
-              <div className="w-full flex justify-center">
-                <AddTask
-                  addTaskMenu={addTaskMenu}
+        {/* Mobile: lists centered, AddTask visible */}
+        <div className="md:hidden w-full flex flex-col items-center gap-4 flex-grow min-w-0">
+          {tabList.map((tab) =>
+            activeTab === tab.status ? (
+              <div className="flex justify-center w-full">
+                <ListCard
+                  key={tab.status}
+                  type={tab.label}
+                  status={tab.status}
+                  tasks={tasks}
+                  cardSelected={cardSelected}
+                  setCardSelected={setCardSelected}
                   setAddTaskMenu={setAddTaskMenu}
+                  setDefaultStatus={setDefaultStatus}
                   fetchProject={fetchProject}
-                  defaultStatus={defaultStatus}
-                  setTasks={setTasks}
+                  className="max-w-[400px] w-full"
                 />
               </div>
-            </div>
+            ) : null
+          )}
+          <div className="w-full flex justify-center">
+            <AddTask
+              addTaskMenu={addTaskMenu}
+              setAddTaskMenu={setAddTaskMenu}
+              fetchProject={fetchProject}
+              defaultStatus={defaultStatus}
+              setTasks={setTasks}
+            />
           </div>
         </div>
         {/* LG/XL: lists centered, notes/logs/add-task hidden */}
