@@ -21,11 +21,13 @@ const Modal = ({
 
   return (
     <div
-      className="modal-overlay w-screen h-screen fixed top-0 left-0 bg-black/50 flex justify-center items-center z-50"
+      className="modal-overlay fixed inset-0 flex items-center justify-center bg-black/50 z-50"
       onClick={handleBackgroundClick}
     >
-      <div className="flex flex-col justify-start bg-[var(--card)] text-[var(--card-foreground)] p-6 w-[400px] rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Create a New Project</h2>
+      <div className="flex flex-col justify-start bg-[var(--card)] text-[var(--card-foreground)] p-4 sm:p-6 w-full max-w-xs sm:max-w-md mx-2 rounded-lg shadow-lg">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">
+          Create a New Project
+        </h2>
         <label className="block my-2" htmlFor="projectName">
           Project Name:
         </label>
@@ -36,7 +38,7 @@ const Modal = ({
           type="text"
           value={newProjectName}
           onChange={(e) => setNewProjectName(e.target.value)}
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:border-purple-400"
+          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:border-purple-400 text-base"
           id="projectName"
         />
         <label className="block my-2" htmlFor="projectDescription">
@@ -46,20 +48,18 @@ const Modal = ({
           required
           placeholder="Project Description"
           value={newProjectDescription}
-          rows="4"
+          rows="3"
           onChange={(e) => setNewProjectDescription(e.target.value)}
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:border-purple-400"
+          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:border-purple-400 text-base"
           id="projectDescription"
         />
-        <div className="flex justify-between mt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4">
           <button
             type="button"
             onClick={handleCreateProject}
             disabled={isCreating}
-            className={`btn ${
-              isCreating
-                ? "opacity-50 cursor-not-allowed"
-                : "px-4 py-2 bg-[var(--purple-button)] text-[var(--purple-button-foreground)] rounded-md hover:bg-[var(--purple-button-hover)]"
+            className={`w-full sm:w-auto px-4 py-2 bg-[var(--purple-button)] text-[var(--purple-button-foreground)] rounded-md hover:bg-[var(--purple-button-hover)] ${
+              isCreating ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {isCreating ? "Creating..." : "Create Project"}
@@ -67,7 +67,7 @@ const Modal = ({
           <button
             onClick={onClose}
             disabled={isCreating}
-            className="px-4 py-2 bg-[var(--secondary)] text-[var(--muted-foreground)] rounded-md hover:bg-[var(--muted)]"
+            className="w-full sm:w-auto px-4 py-2 bg-[var(--secondary)] text-[var(--muted-foreground)] rounded-md hover:bg-[var(--muted)]"
           >
             Cancel
           </button>
@@ -113,7 +113,7 @@ const ProjectCard = ({ title, _id, deleteProject }) => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [projects, setProjects] = useState([]);
@@ -122,6 +122,42 @@ const Sidebar = () => {
   const [addProjectMenu, setAddProjectMenu] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDescription, setNewProjectDescription] = useState("");
+  // Swipe state
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchCurrentX, setTouchCurrentX] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Only enable swipe on mobile
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth < 768 : false;
+
+  // Handle touch start
+  const handleTouchStart = (e) => {
+    if (!isMobile) return;
+    setTouchStartX(e.touches[0].clientX);
+    setTouchCurrentX(e.touches[0].clientX);
+    setIsAnimating(false);
+  };
+  // Handle touch move
+  const handleTouchMove = (e) => {
+    if (!isMobile || touchStartX === null) return;
+    setTouchCurrentX(e.touches[0].clientX);
+  };
+  // Handle touch end
+  const handleTouchEnd = () => {
+    if (!isMobile || touchStartX === null) return;
+    const deltaX = touchCurrentX - touchStartX;
+    if (deltaX < -60) {
+      // Swiped left
+      setIsAnimating(true);
+      setTimeout(() => {
+        setIsSidebarOpen(false);
+        setIsAnimating(false);
+      }, 250);
+    }
+    setTouchStartX(null);
+    setTouchCurrentX(null);
+  };
 
   const handleCreateProject = async () => {
     if (!newProjectName.trim() || isCreating) return;
@@ -196,8 +232,27 @@ const Sidebar = () => {
     fetchProjects();
   }, []);
 
+  // Calculate sidebar style for animation
+  const sidebarStyle = isMobile
+    ? {
+        transform:
+          touchStartX !== null && touchCurrentX !== null
+            ? `translateX(${Math.min(0, touchCurrentX - touchStartX)}px)` // Only allow left movement
+            : isAnimating
+            ? "translateX(-100%)"
+            : "translateX(0)",
+        transition: isAnimating ? "transform 0.25s ease" : "none",
+      }
+    : {};
+
   return (
-    <div className="flex flex-col bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)] h-screen items-center shadow py-1">
+    <div
+      className="w-4/5 sm:w-full flex flex-col bg-[var(--sidebar-background)] text-[var(--sidebar-foreground)] h-screen items-center shadow py-1"
+      style={sidebarStyle}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="h-[60px]  flex flex-row gap-4 items-center justify-center font-[Shantell_sans] text-[var(--sidebar-primary)] text-2xl font-bold">
         <img src="/icon.svg" className="h-10 mx-auto" alt="Logo" />
         kanban

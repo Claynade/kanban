@@ -17,7 +17,7 @@ const AddTask = ({
   return (
     <div className="flex flex-col items-center justify-center h-[60px]">
       <div
-        className="h-[40px] p-1 text-lg text-center font-bold font-[Shantell_sans] text-white w-[260px] rounded-lg bg-purple-600"
+        className="hidden md:block h-[40px] p-1 text-lg text-center font-bold text-white w-[260px] rounded-lg bg-purple-600"
         onClick={() => setAddTaskMenu(true)}
       >
         Add a task
@@ -77,77 +77,100 @@ const ProjectPage = () => {
     }
   };
 
-  const boardRef = useRef(null);
-  const handleBackgroundClick = (e) => {
-    if (boardRef.current && e.target === boardRef.current) {
-      setCardSelected(null);
-    }
-  };
-
   useEffect(() => {
     if (id) {
       fetchProject();
     }
   }, [id]);
 
+  const [activeTab, setActiveTab] = useState("backlog");
+  const tabList = [
+    { label: "Backlog", status: "backlog" },
+    { label: "To-Do", status: "todo" },
+    { label: "Done", status: "done" },
+  ];
+
   return (
-    <div className="project-background flex flex-row gap-3 justify-evenly bg-[var(--background)] text-[var(--foreground)]">
-      <div className="flex flex-row gap-3 flex-grow justify-center">
-        <ListCard
-          type="Backlog"
-          status="backlog"
-          tasks={tasks}
-          cardSelected={cardSelected}
-          setCardSelected={setCardSelected}
-          setAddTaskMenu={setAddTaskMenu}
-          setDefaultStatus={setDefaultStatus}
-          fetchProject={fetchProject}
-        />
-        <ListCard
-          type="To-Do"
-          status="todo"
-          tasks={tasks}
-          cardSelected={cardSelected}
-          setCardSelected={setCardSelected}
-          setAddTaskMenu={setAddTaskMenu}
-          setDefaultStatus={setDefaultStatus}
-          fetchProject={fetchProject}
-        />
-        <ListCard
-          type="Done"
-          status="done"
-          tasks={tasks}
-          cardSelected={cardSelected}
-          setCardSelected={setCardSelected}
-          setAddTaskMenu={setAddTaskMenu}
-          setDefaultStatus={setDefaultStatus}
-          fetchProject={fetchProject}
-        />
+    <div className="project-background flex flex-col md:flex-row gap-3 justify-evenly overflow-y-auto overflow-x md:overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
+      <div className="md:hidden flex flex-row justify-center gap-2 py-2">
+        {tabList.map((tab) => (
+          <button
+            key={tab.status}
+            className={`px-4 py-2 rounded-lg font-bold ${
+              activeTab === tab.status
+                ? "bg-purple-600 text-white"
+                : "bg-[var(--muted)] text-[var(--foreground)]"
+            }`}
+            onClick={() => setActiveTab(tab.status)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      <div className="flex flex-col gap-4 justify-start items-center h-[500px] w-[300px]">
-        <div className="flex flex-col items-center bg-[var(--card)] text-[var(--foreground)] rounded-lg">
-          <div className=" text-sm font-medium py-2 ">Notes</div>
+      <div className="flex flex-row gap-3 flex-grow justify-center">
+        <div className="w-full md:w-auto flex justify-center">
+          <div className="md:hidden">
+            {tabList.map((tab) =>
+              activeTab === tab.status ? (
+                <ListCard
+                  key={tab.status}
+                  type={tab.label}
+                  status={tab.status}
+                  tasks={tasks}
+                  cardSelected={cardSelected}
+                  setCardSelected={setCardSelected}
+                  setAddTaskMenu={setAddTaskMenu}
+                  setDefaultStatus={setDefaultStatus}
+                  fetchProject={fetchProject}
+                />
+              ) : null
+            )}
+          </div>
+          <div className="hidden md:flex flex-row gap-3">
+            {tabList.map((tab) => (
+              <ListCard
+                key={tab.status}
+                type={tab.label}
+                status={tab.status}
+                tasks={tasks}
+                cardSelected={cardSelected}
+                setCardSelected={setCardSelected}
+                setAddTaskMenu={setAddTaskMenu}
+                setDefaultStatus={setDefaultStatus}
+                fetchProject={fetchProject}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 w-full sm:w-[350px] md:w-[300px] lg:w-[320px] xl:w-[350px] min-w-[220px] max-w-full md:max-w-[350px] items-center md:items-stretch justify-start md:justify-start">
+        {/* Notes: only on large screens */}
+        <div className="hidden lg:flex flex-col bg-[var(--card)] text-[var(--foreground)] rounded-lg w-full">
+          <div className="text-sm font-medium py-2 px-4">Notes</div>
           <textarea
-            className={`text-sm w-[295px] h-[180px] p-3 border-t rounded-b-lg border-[var(--border)] focus:outline-none focus:bg-[var(--muted)] ${customScrollbarCss} focus:[&::-webkit-scrollbar-thumb]:bg-[var(--secondary)]`}
-          ></textarea>{" "}
-          {/* it isnt unique for different projects. Todo: make it unique */}
+            className={`text-sm w-full h-[120px] p-3 border-t rounded-b-lg border-[var(--border)] focus:outline-none focus:bg-[var(--muted)] ${customScrollbarCss} focus:[&::-webkit-scrollbar-thumb]:bg-[var(--secondary)]`}
+          ></textarea>
         </div>
 
-        <div className="flex flex-col gap-1 p-2 justify-start items-center grow border-2 border-[var(--border)] shadow-md">
-          <div className="font-bold text-lg text-[var(--foreground)] f border-b-3 border-[var(--border)] w-full text-center">
+        {/* Logs: always visible, responsive */}
+        <div className="flex flex-col gap-1 p-2 items-center w-full border-2 border-[var(--border)] shadow-md min-h-[120px]">
+          <div className="font-bold text-lg text-[var(--foreground)] border-b-3 border-[var(--border)] w-full text-center">
             Logs
           </div>
-          <div className="font-bold text-lg w-[275px] h-[140px]"></div>
+          <div className="font-bold text-lg w-full h-[80px]"></div>
         </div>
 
-        <AddTask
-          addTaskMenu={addTaskMenu}
-          setAddTaskMenu={setAddTaskMenu}
-          fetchProject={fetchProject}
-          defaultStatus={defaultStatus}
-          setTasks={setTasks}
-        />
+        <div className="w-full flex justify-center">
+          <AddTask
+            addTaskMenu={addTaskMenu}
+            setAddTaskMenu={setAddTaskMenu}
+            fetchProject={fetchProject}
+            defaultStatus={defaultStatus}
+            setTasks={setTasks}
+          />
+        </div>
       </div>
     </div>
   );

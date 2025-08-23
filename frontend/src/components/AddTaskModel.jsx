@@ -74,11 +74,11 @@ const AddTaskModel = ({
 
   return (
     <div
-      className="modal-layout h-screen w-screen absolute top-0 left-0 flex flex-col items-center justify-center bg-black/55 z-50"
+      className="modal-layout fixed inset-0 flex items-center justify-center bg-black/55 z-50"
       onClick={handleClose}
     >
-      <div className="bg-[var(--card)] text-[var(--foreground)] p-6 rounded-lg shadow-lg w-[400px]">
-        <h2 className="text-2xl text-[var(--secondary-foreground)] font-bold mb-4">
+      <div className="bg-[var(--card)] text-[var(--foreground)] p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-md mx-2">
+        <h2 className="text-xl sm:text-2xl text-[var(--secondary-foreground)] font-bold mb-4 text-center">
           Add New Task
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -86,21 +86,21 @@ const AddTaskModel = ({
             type="text"
             placeholder="Task Title"
             name="title"
-            className="w-full px-4 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)]"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)] text-base"
             value={newTask.title}
             onChange={handleChange}
           />
           <textarea
             placeholder="Task Description"
             name="description"
-            className="w-full px-4 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)]"
-            rows="4"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] text-[var(--foreground)] text-base"
+            rows="3"
             value={newTask.description}
             onChange={handleChange}
           ></textarea>
           <select
             name="status"
-            className="w-full px-4 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)]"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)] text-base"
             value={newTask.status}
             onChange={handleChange}
           >
@@ -110,7 +110,7 @@ const AddTaskModel = ({
           </select>
           <select
             name="priority"
-            className="w-full px-4 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)]"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--ring)] focus:border-[var(--ring)] bg-[var(--card)] text-[var(--foreground)] text-base"
             value={newTask.priority}
             onChange={handleChange}
           >
@@ -118,19 +118,19 @@ const AddTaskModel = ({
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2">
             <button
               type="submit"
               disabled={isCreating}
               onClick={handleSubmit}
-              className="px-4 py-2 bg-[var(--purple-button)] text-[var(--purple-button-foreground)] rounded-md hover:bg-[var(--purple-button-hover)] "
+              className="w-full sm:w-auto px-4 py-2 bg-[var(--purple-button)] text-[var(--purple-button-foreground)] rounded-md hover:bg-[var(--purple-button-hover)] "
             >
               Add Task
             </button>
             <button
               type="button"
               disabled={isCreating}
-              className="px-4 py-2 bg-[var(--secondary)] text-[var(--muted-foreground)] rounded-md hover:bg-[var(--muted)]"
+              className="w-full sm:w-auto px-4 py-2 bg-[var(--secondary)] text-[var(--muted-foreground)] rounded-md hover:bg-[var(--muted)]"
               onClick={() => setAddTaskMenu(false)}
             >
               Cancel
