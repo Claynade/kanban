@@ -40,7 +40,7 @@ const ProtectedLayout = () => {
   );
 };
 
-// Public routes that redirect to dashboard if already logged in
+// Routes that should only be accessible to non-authenticated users
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -48,14 +48,21 @@ const PublicRoute = ({ children }) => {
     return <LoadingSpinner />;
   }
 
-  return user ? <Navigate to="/dashboard" replace /> : children;
+  // Redirect authenticated users to their default route
+  return user ? <Navigate to="/projects" replace /> : children;
 };
 
 const App = () => {
+  const { user } = useAuth();
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Home route with conditional rendering based on auth state */}
+        <Route
+          path="/"
+          element={user ? <Navigate to="/projects" replace /> : <Home />}
+        />
         <Route
           path="/signup"
           element={
@@ -74,11 +81,17 @@ const App = () => {
         />
 
         {/* Protected routes */}
-        <Route path="/dashboard" element={<ProtectedLayout />}>
+        <Route path="/projects" element={<ProtectedLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="project/:id" element={<ProjectPage />} />
-          <Route path="project/:id/:taskId" element={<TaskPage />} />
+          <Route path=":id" element={<ProjectPage />} />
+          <Route path=":id/:taskId" element={<TaskPage />} />
         </Route>
+
+        {/* Legacy route - redirect to new URL structure */}
+        <Route
+          path="/dashboard/*"
+          element={<Navigate to="/projects" replace />}
+        />
 
         {/* 404 route */}
         <Route path="*" element={<NotFound />} />

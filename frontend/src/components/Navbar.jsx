@@ -129,10 +129,10 @@ export default function NavHeader({ isSidebarOpen, setIsSidebarOpen }) {
         {/* Support button - hidden on small screens */}
         <Link
           to="#"
-          className="hidden sm:flex p-2 rounded-full hover:bg-[var(--muted)] hover:text-[var(--chart-1)] cursor-pointer"
+          className="hidden sm:flex p-2 rounded-full hover:bg-[var(--muted)] cursor-pointer group"
         >
           <AiOutlineQuestionCircle
-            className="text-[var(--muted-foreground)] text-2xl"
+            className="text-[var(--muted-foreground)] text-2xl group-hover:text-[var(--chart-1)] transition-colors duration-200"
             title="Support"
           />
         </Link>
@@ -140,10 +140,10 @@ export default function NavHeader({ isSidebarOpen, setIsSidebarOpen }) {
         {/* Settings button - hidden on small screens */}
         <Link
           to="#"
-          className="hidden sm:flex p-2 rounded-full hover:bg-[var(--muted)] hover:text-[var(--chart-1)] cursor-pointer"
+          className="hidden sm:flex p-2 rounded-full hover:bg-[var(--muted)] cursor-pointer group"
         >
           <AiOutlineSetting
-            className="text-[var(--muted-foreground)] text-2xl"
+            className="text-[var(--muted-foreground)] text-2xl group-hover:text-[var(--chart-1)] transition-colors duration-200"
             title="Settings"
           />
         </Link>

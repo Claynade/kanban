@@ -21,7 +21,7 @@ const Login = () => {
       setMessage(response.data.message || "Login successful");
       setForm({ email: "", password: "" });
       setUser(response.data.user); // update global auth state
-      navigate("/dashboard");
+      navigate("/projects");
     } catch (error) {
       setMessage(
         error.response?.data?.message ||
