@@ -41,13 +41,14 @@ const Home = () => {
         </div>
 
         {/* Preview Image */}
-        <div className="mt-16 rounded-xl overflow-hidden shadow-xl border border-[var(--border)]">
+        {/*<div className="mt-16 rounded-xl overflow-hidden shadow-xl border border-[var(--border)]">
           <img
             src="/bg.jpg"
             alt="Kanban Projects Preview"
             className="w-full h-auto rounded-xl"
           />
         </div>
+        */}
       </section>
 
       {/* Features Section */}
