@@ -18,9 +18,9 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await api.post("/auth/login", form);
-      setMessage(response.data.message || "Login successful");
+      setMessage("Login successful");
       setForm({ email: "", password: "" });
-      setUser(response.data.user); // update global auth state
+      setUser(response.data.user);
       navigate("/projects");
     } catch (error) {
       setMessage(
@@ -30,68 +30,58 @@ const Login = () => {
       );
     }
   };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#1d0f27] to-[#2c3364] relative overflow-hidden">
-      <div className="bg-white h-[500px] max-w-md w-1/2 rounded-l-lg overflow-hidden">
-        <img
-          src="/reg-bg.png"
-          alt="login"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="bg-white p-8 rounded-r-lg h-[500px]  shadow-md w-1/2 max-w-md relative z-10">
-        <h2 className="text-3xl font-semibold text-blue-600 mb-6 text-center">
-          Login to Your Account
-        </h2>
+    <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="w-full max-w-md p-8 bg-[#111111] rounded-lg shadow-md">
+        <h2 className="text-3xl font-semibold text-center mb-6">Log In</h2>
+        {message && (
+          <p className="text-center text-sm text-red-500 mb-4">{message}</p>
+        )}
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-gray-700 mb-2" htmlFor="email">
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email
             </label>
             <input
               id="email"
               type="email"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-white focus:ring-blue-400"
-              placeholder="Enter your email"
-              required
               value={form.email}
               onChange={handleChange}
+              className="w-full px-3 py-2 bg-[#222222] border border-[#333333] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your email"
+              required
             />
           </div>
           <div>
-            <label className="block text-gray-700 mb-2" htmlFor="password">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mb-1"
+            >
               Password
             </label>
             <input
               id="password"
               type="password"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-white focus:ring-blue-400"
-              placeholder="Create a password"
-              required
               value={form.password}
               onChange={handleChange}
+              className="w-full px-3 py-2 bg-[#222222] border border-[#333333] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your password"
+              required
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md text-lg hover:bg-blue-700 transition-colors"
+            className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Login
+            Log In
           </button>
         </form>
-        {message && (
-          <p
-            className={`mt-4 text-center ${
-              message == "Login successful"
-                ? "font-bold text-green-600"
-                : "text-red-400"
-            }`}
-          >
-            {message}
-          </p>
-        )}
-        <p className="mt-6 text-center text-gray-600">
-          Don't have an account? <a href="/signup">Sign up</a>
+        <p className="mt-4 text-center text-sm text-gray-400">
+          Don’t have an account?{" "}
+          <a href="/signup" className="text-blue-500 hover:underline">
+            Sign up
+          </a>
         </p>
       </div>
     </div>

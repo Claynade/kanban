@@ -256,14 +256,12 @@ const ProjectPage = () => {
   );
 
   return (
-    <div className="project-background flex flex-col gap-4 justify-evenly overflow-x md:overflow-hidden bg-[var(--background)] text-[var(--foreground)] min-h-screen w-full">
-      <div className="w-full flex flex-col gap-4 flex-grow min-w-0">
-        <MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-        <MobileView />
-        <MdView />
-        <LgXlView />
-        <TwoXlView />
-      </div>
+    <div className="project-background flex flex-col justify-start overflow-x md:overflow-hidden bg-[var(--background)] text-[var(--foreground)] h-full w-full">
+      <MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      <MobileView />
+      <MdView />
+      <LgXlView />
+      <TwoXlView />
     </div>
   );
 };

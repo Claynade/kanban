@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { customScrollbarCss } from "../utils/customScrollbarCss";
 
 const MainLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -37,7 +38,9 @@ const MainLayout = () => {
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
-        <main className="flex-1 px-6 pt-6 overflow-auto">
+        <main
+          className={`flex-1 px-6 pt-6 overflow-auto ${customScrollbarCss}`}
+        >
           <Outlet />
         </main>
       </div>

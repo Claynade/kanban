@@ -215,7 +215,7 @@ const ListCard = ({
 
   return (
     <div
-      className={`flex flex-col p-2 bg-[var(--card)] h-full min-h-[560px] md:h-[560px] 2xl:h-full rounded-lg shadow text-[var(--card-foreground)] ${
+      className={`flex flex-col p-2 bg-[var(--card)] h-full min-h-[560px] md:h-[560px] lg:h-[600px] rounded-lg shadow text-[var(--card-foreground)] ${
         className || "min-w-[220px] max-w-[350px]"
       }`}
     >
