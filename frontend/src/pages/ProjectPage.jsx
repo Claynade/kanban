@@ -141,7 +141,7 @@ const ProjectPage = () => {
 
   // Component for Mobile View
   const MobileView = () => (
-    <div className="md:hidden w-full flex flex-col items-center gap-4 flex-grow min-w-0">
+    <div className="md:hidden pb-6 w-full flex flex-col items-center gap-4 flex-grow min-w-0">
       {TAB_LIST.map(
         (tab) =>
           activeTab === tab.status && (
@@ -155,15 +155,14 @@ const ProjectPage = () => {
             </div>
           )
       )}
-      <div className="w-full flex justify-center">
-        <AddTask
-          addTaskMenu={addTaskMenu}
+      {addTaskMenu && (
+        <AddTaskModel
+          setTasks={setTasks}
           setAddTaskMenu={setAddTaskMenu}
           fetchProject={fetchProject}
           defaultStatus={defaultStatus}
-          setTasks={setTasks}
         />
-      </div>
+      )}
     </div>
   );
 
@@ -227,7 +226,7 @@ const ProjectPage = () => {
 
   // Component for 2XL and Above View
   const TwoXlView = () => (
-    <div className="hidden 2xl:flex flex-row gap-4 w-full justify-center">
+    <div className="hidden 2xl:flex pb-6 flex-row gap-4 w-full justify-center">
       <div className="flex flex-row gap-4 flex-grow max-w-6xl min-w-0 justify-center items-stretch">
         {TAB_LIST.map((tab) => (
           <ListCard

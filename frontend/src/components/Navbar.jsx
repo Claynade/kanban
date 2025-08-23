@@ -93,7 +93,7 @@ export default function NavHeader({ isSidebarOpen, setIsSidebarOpen }) {
   };
 
   return (
-    <div className="sticky top-0 z-40 px-3 sm:px-6 py-2 flex h-[60px] shadow-sm justify-between items-center border-b-3 border-[var(--border)] bg-[var(--background)]">
+    <div className="px-3 sm:px-6 py-2 flex h-[60px] shadow-sm justify-between items-center border-b-3 border-[var(--border)] bg-[var(--background)]">
       {/* Mobile sidebar toggle */}
       <div className="flex items-center">
         <button
