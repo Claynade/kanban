@@ -123,3 +123,29 @@ export const deleteTask = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+export const getTasksForProject = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized access' });
+    }
+
+    try {
+        const project = await Project.findOne({ _id: id }).populate('tasks');
+
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
+        if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
+            return res.status(403).json({ message: 'Unauthorized access to project' });
+        }
+
+        return res.json(project.tasks);
+    } catch (error) {
+        console.error('Error fetching tasks for project:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};

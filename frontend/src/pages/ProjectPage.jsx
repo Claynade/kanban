@@ -83,30 +83,18 @@ const useProjectData = (projectId) => {
 
   const fetchProject = async () => {
     try {
-      const response = await API.get(`/projects/${projectId}`);
-      const projectData = response.data;
+      const response = await API.get(`/tasks/${projectId}`);
+      const tasks = response.data;
 
-      if (!projectData) {
-        setMessage("Failed to load project");
-        console.error("Project data not found in response:", response.data);
+      if (!tasks || tasks.length === 0) {
+        setMessage("No tasks found for this project");
         return;
       }
 
-      const taskResponses = await Promise.all(
-        projectData.tasks.map((task) =>
-          API.get(`/tasks/${projectId}/${task}`)
-            .then((res) => res.data)
-            .catch((err) => {
-              console.error("Failed to fetch task:", task._id, err);
-              return GHOST_TASK;
-            })
-        )
-      );
-
-      setTasks(taskResponses);
-    } catch (err) {
-      console.error("Error fetching project:", err);
-      setMessage("Error loading project");
+      setTasks(tasks);
+    } catch (error) {
+      console.error("Error fetching tasks for project:", error);
+      setMessage("Failed to load tasks");
     }
   };
 
