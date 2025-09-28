@@ -15,10 +15,7 @@ const projectSchema = new mongoose.Schema({
         required: true,
         trim: true
     }, */
-    tasks: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Task'
-    }],
+    // Removed tasks array for performance and data consistency. Use Task.projectId for queries.
     authorizedUsers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

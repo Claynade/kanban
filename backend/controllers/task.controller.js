@@ -78,9 +78,7 @@ export const updateTask = async (req, res) => {
         if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
-        if (!project.tasks.includes(task_id)) {
-            return res.status(404).json({ message: 'Task not found in this project' });
-        }
+        // No project.tasks array, just check if the task exists for this project
         const task = await Task.findOne({ _id: task_id, projectId: id });
         if (!task) {
             return res.status(404).json({ message: 'Task not found or unauthorized' });
@@ -127,25 +125,20 @@ export const deleteTask = async (req, res) => {
 export const getTasksForProject = async (req, res) => {
     const { id } = req.params;
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized access' });
 
-    if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized access' });
+    // Check project and authorization
+    const project = await Project.findById(id).lean();
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+    if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
+        return res.status(403).json({ message: 'Unauthorized access to project' });
     }
 
-    try {
-        const project = await Project.findOne({ _id: id }).populate('tasks');
+    // Fetch tasks directly by projectId, populate user info
+    const tasks = await Task.find({ projectId: id })
+        .populate('createdBy', 'name email')
+        .populate('assignedTo.id', 'name email')
+        .lean();
 
-        if (!project) {
-            return res.status(404).json({ message: 'Project not found' });
-        }
-
-        if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
-            return res.status(403).json({ message: 'Unauthorized access to project' });
-        }
-
-        return res.json(project.tasks);
-    } catch (error) {
-        console.error('Error fetching tasks for project:', error);
-        return res.status(500).json({ message: 'Internal server error' });
-    }
+    return res.json(tasks);
 };

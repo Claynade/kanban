@@ -24,9 +24,8 @@ const formatDate = (dateString) => {
 /**
  * TaskMeta component displays user info, date, and comment count
  */
-const TaskMeta = ({ username, createdAt }) => {
+const TaskMeta = ({ createdBy, createdAt }) => {
   const formattedDate = formatDate(createdAt);
-
   return (
     <div className="rounded-md">
       <div className="flex items-center justify-between">
@@ -34,16 +33,15 @@ const TaskMeta = ({ username, createdAt }) => {
         <div className="flex items-center space-x-2">
           <div className="h-6 w-6 rounded-full overflow-hidden">
             <img
-              src="/placeholder.svg"
-              alt="Avatar"
+              src={createdBy?.profilePicture || "/placeholder.svg"}
+              alt={createdBy?.name || "Avatar"}
               className="h-full w-full object-cover"
             />
           </div>
           <span className="text-xs text-[var(--muted-foreground)]">
-            {username}
+            {createdBy?.name || "Unknown"}
           </span>
         </div>
-
         {/* Date and comments count */}
         <div className="flex items-center space-x-2 text-[var(--muted-foreground)]">
           <div className="flex items-center space-x-1">
@@ -176,7 +174,6 @@ const TaskCard = ({
   markInProgress,
   deleteTask,
 }) => {
-  const username = useUsername();
   const isSelected = cardSelected === _id;
   const navigate = useNavigate();
 
@@ -232,7 +229,7 @@ const TaskCard = ({
 
         <div className="pt-0">
           <TaskTags />
-          <TaskMeta username={username} createdAt={createdAt} />
+          <TaskMeta createdBy={createdBy} createdAt={createdAt} />
         </div>
       </div>
 

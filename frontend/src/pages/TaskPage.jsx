@@ -61,18 +61,31 @@ const TaskPage = () => {
               handleAddComment={handleAddComment}
               handleAddReply={handleAddReply}
             />
-          </div>
-          <div>
             <div>
               Assigned To:{" "}
-              {task.assignedTo.map((user) => (
-                <span key={user._id} className="mr-2">
-                  {user._id}
-                </span>
-              ))}
+              {task.assignedTo && task.assignedTo.length > 0 ? (
+                task.assignedTo.map((user) => (
+                  <span
+                    key={user.id?._id || user._id}
+                    className="mr-2 flex items-center gap-1"
+                  >
+                    <img
+                      src={user.id?.profilePicture || "/placeholder.svg"}
+                      alt={user.id?.name || "Avatar"}
+                      className="w-5 h-5 rounded-full inline-block"
+                    />
+                    {user.id?.name || user.name || "Unknown"}
+                  </span>
+                ))
+              ) : (
+                <span>None</span>
+              )}
             </div>
             <div>Status: {task.status}</div>
             <div>Priority: {task.priority}</div>
+            <div>
+              Created By: {task.createdBy ? task.createdBy.name : "Unknown"}
+            </div>
             <div>
               Created By: {task.createdBy ? task.createdBy.username : "Unknown"}
             </div>

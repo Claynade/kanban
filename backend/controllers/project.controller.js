@@ -72,7 +72,7 @@ export const updateProject = async (req, res) => {
             await user.save();
         }
         project.name = updatedProject.name || project.name;
-        project.tasks = updatedProject.tasks || project.tasks;
+    // Removed project.tasks update for consistency with new model
         await project.save();
         return res.json({ message: 'Project updated successfully', project });
     } catch (error) {
@@ -96,9 +96,8 @@ export const deleteProject = async (req, res) => {
         if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
-        for (const taskId of project.tasks) {
-            await Task.deleteOne({ _id: taskId });
-        }
+        // Delete all tasks for this project
+        await Task.deleteMany({ projectId: id });
         user.projects = user.projects.filter(p => p.id.toString() !== id);
         await user.save();
         await Project.deleteOne({ _id: id });
