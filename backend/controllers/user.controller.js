@@ -40,3 +40,24 @@ export const getUserData = async (req, res) => {
         projects: user.projects
     });
 };
+
+export const getUsers = async (req, res) => {
+    const users = await User.find({}, 'username profilePicture email role');
+    res.json(users);
+};
+
+export const getUser = async (req, res) => {
+    const user = await User.findById(req.params.id, 'username profilePicture email role');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+};
+
+export const updateUser = async (req, res) => {
+    const { username, profilePicture } = req.body;
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { username, profilePicture },
+        { new: true, select: 'username profilePicture email role' }
+    );
+    res.json(user);
+};

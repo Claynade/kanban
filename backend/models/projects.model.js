@@ -10,21 +10,43 @@ const projectSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-/*     description: {
+    description: {
         type: String,
         required: true,
         trim: true
-    }, */
-    tasks: [{
+    },
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Task'
-    }],
+        ref: "User",
+        required: true
+    },
     authorizedUsers: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: false
+        ref: "User"
     }],
-
+    tasks: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Task"
+    }],
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment"
+    }],
+    shareableLink: {
+        type: String,
+        default: "",
+    },
+    adminUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
+    tags: [{
+        type: String
+    }],
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
-export const Project = mongoose.model('Project', projectSchema);
+export const Project = mongoose.model("Project", projectSchema);

@@ -1,51 +1,17 @@
-import mongoose from 'mongoose';
-
+import mongoose from "mongoose";
 const taskSchema = new mongoose.Schema({
-    title:{
-        type: String,
-        required: true,
-        trim: true
-    },
-    description:{
-        type: String,
-        required: true,
-        trim: true
-    },
-    status:{
-        type: String,
-        enum: ['todo', 'backlog', 'done'],
-        default: 'todo'
-    },
-    priority: {
-        type: String,
-        enum: ['Low', 'Medium', 'High'],
-        default: 'Low'
-    },
-    projectId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Project',
-        required: true
-    },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-     assignedTo: [{
-        id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        }
-    }],
-})
-
-export const Task = mongoose.model('Task', taskSchema);
+  title: { type: String, required: true },
+  description: String,
+  status: { type: String, enum: ["backlog", "todo", "done"], default: "backlog" },
+  priority: { type: String, enum: ["Low", "Medium", "High"], default: "Low" },
+  tags: [{ type: String }],
+  projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  createdAt: { type: Date, default: Date.now },
+  comments: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+  }],
+});
+export const Task = mongoose.model("Task", taskSchema);

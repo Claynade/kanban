@@ -16,7 +16,7 @@ export const getTask = async (req, res) => {
         if (!project.authorizedUsers.map(u => u.toString()).includes(userId)) {
             return res.status(403).json({ message: 'Unauthorized access to project' });
         }
-        const task = await Task.findOne({ _id: task_id });
+        const task = await Task.findOne({ _id: task_id }).populate('createdBy', 'username profilePicture').populate('assignedTo', 'username profilePicture');
         if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }
